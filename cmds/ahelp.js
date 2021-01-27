@@ -12,7 +12,7 @@ module.exports = {
     const { cmds } = message.client;
 
     let embed = new Discord.MessageEmbed();
-    embed.setTitle(`Villagerbot Admin Help`);
+    embed.setTitle(`StonkTracker Admin Help`);
     embed.setDescription('List all currently available admin ommands.');
     embed.setColor(rcolor());
     embed.setThumbnail(message.client.user.displayAvatarURL());
