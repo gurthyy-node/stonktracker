@@ -14,7 +14,7 @@ let gmeServers = [];
 let woofServers = [];
 
 var hour = new Date().getHours();
-if (hour >= 9 && hour <= 16) {
+if (hour >= 6 && hour <= 13) {
   setInterval(autoUpdate, 2000);
 }
 
@@ -69,7 +69,7 @@ bot.on('message', async (message) => {
 
   if (
     command.adminOnly &&
-    !message.member.roles.cache.has('740824960896860160')
+    !message.member.roles.cache.has(process.env.ADMIN_ROLE)
   ) {
     return message.reply('You do not have access to this command. Sorry!');
   }
@@ -171,7 +171,7 @@ woof.login(process.env.WOOF_TOKEN);
 function getPrice(symbol, callback) {
   yahoo.price(symbol, function (err, data) {
     price = (Math.round(data * 1000) / 1000).toFixed(2);
-    console.log(symbol + ' price updated to $' + price);
+    //of mainconsole.log(symbol + ' price updated to $' + price);
     return callback(price);
   });
 }

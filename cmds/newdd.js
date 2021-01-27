@@ -6,9 +6,9 @@ const PastebinAPI = require('pastebin-js');
 pastebin = new PastebinAPI(`${process.env.PASTEBIN_API}`);
 
 module.exports = {
-  name: 'new',
+  name: 'newdd',
   aliases: [],
-  description: `Submit a Due Diligence Report. Use: **${process.env.PREFIX}new [Company Name] [Pastebin URL]**`,
+  description: `Submit a Due Diligence Report. Currently supports PasteBin. Google Docs support coming soon. \n Use: **${process.env.PREFIX}new [Company Name] [Pastebin URL]**`,
   args: true,
   displayInHelp: true,
   execute(message, args) {
@@ -47,7 +47,3 @@ module.exports = {
     });
   },
 };
-
-//.then(() => embed.react('👍'))
-//.then(() => embed.react('👎'))
-//.catch(console.log('Failed to add emotes to message'));

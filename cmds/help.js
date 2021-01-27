@@ -11,7 +11,7 @@ module.exports = {
     const { cmds } = message.client;
 
     let embed = new Discord.MessageEmbed();
-    embed.setTitle(`DD Bot Help`);
+    embed.setTitle(`StonkTracker Help`);
     embed.setDescription('List all currently available commands.');
     embed.setColor(rcolor());
     embed.setThumbnail(message.client.user.displayAvatarURL());
@@ -28,7 +28,7 @@ module.exports = {
         embed.addField(
           '**' + command.name + '**',
           command.description + '\n``' + 'Aliases: ' + formatedAliases + '``',
-          true,
+          false,
         );
       }
     });
