@@ -18,6 +18,7 @@ let woofServers = [];
  ***********************************************************/
 const bot = new Discord.Client();
 bot.cmds = new Discord.Collection();
+setInterval(autoUpdate, 2000);
 
 const commandFiles = fs
   .readdirSync('./cmds')
@@ -166,7 +167,16 @@ woof.login(process.env.WOOF_TOKEN);
 function getPrice(symbol, callback) {
   yahoo.price(symbol, function (err, data) {
     price = (Math.round(data * 1000) / 1000).toFixed(2);
-    console.log(symbol + ' price updated to $' + price);
+    //console.log(symbol + ' price updated to $' + price);
     return callback(price);
   });
 }
+
+function autoUpdate() {
+  updateGME();
+  updateWoof();
+}
+
+/***************************************************
+ ******************  Auto-Update  ******************
+ ***************************************************/
