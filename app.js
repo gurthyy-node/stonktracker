@@ -1,29 +1,17 @@
 console.log(`======== Starting StonkTracker ========`);
 const Discord = require('discord.js');
-
 const dotenv = require('dotenv');
 dotenv.config();
 const prefix = process.env.PREFIX;
-const request = require('request');
 const rcolor = require('rcolor');
 const fs = require('fs');
 const _ = require('lodash');
-
-// Stock API Creation
-const finnhub = require('finnhub');
-const api_key = finnhub.ApiClient.instance.authentications['api_key'];
-api_key.apiKey = process.env.STOCK_API_TOKEN;
-const finnhubClient = new finnhub.DefaultApi();
-
-let tickers = [];
-let today = new Date();
+const yahoo = require('yahoo-financial-data');
 
 /***********************************************************
- *******************  Discord Bot Setup  *******************
+ *********************  Main Bot Setup  ********************
  ***********************************************************/
-
-//Create bot client and register commands from the 'cmds' folder
-const bot = new Discord.Client(); // [partials: ['MESSAGE', 'REACTION', 'USER']]
+const bot = new Discord.Client();
 bot.cmds = new Discord.Collection();
 
 const commandFiles = fs
@@ -35,16 +23,13 @@ for (const file of commandFiles) {
   bot.cmds.set(command.name, command);
 }
 
-//When ready, log on, build invite link and set initial activity.
 bot.on('ready', async function () {
   console.log(`Logged in as ${bot.user.tag}`);
 
   bot.user.setActivity('all the stonks', { type: 'WATCHING' });
 
-  //let minLink = await bot.generateInvite(67431424);
-  //let maxLink = await bot.generateInvite('ADMINISTRATOR');
-  //console.log('Invite with Minimal permissions: ' + minLink);
-  //console.log('Invite with Full Admin: ' + maxLink);
+  //let inviteLink = await bot.generateInvite(201714752);
+  //console.log('Invite to server: ' + inviteLink);
 });
 
 /*********************************************************
@@ -94,33 +79,51 @@ bot.on('message', async (message) => {
 /***************************************************
  ******************* GME Ticker ********************
  ***************************************************/
+const gme = new Discord.Client();
 
-//Create bot client and register commands from the 'cmds' folder
-const gme = new Discord.Client(); // [partials: ['MESSAGE', 'REACTION', 'USER']]
-
-//When ready, log on, build invite link and set initial activity.
 gme.on('ready', async function () {
   console.log(`Logged in as ${gme.user.tag}`);
 
   gme.user.setActivity('$GME - GameStop', { type: 'WATCHING' });
-  tickers.push('GME');
-  console.log(tickers);
-  updateNicknames(tickers);
+  updateGME();
 
-  /*let minLink = await gme.generateInvite(67431424);
-  let maxLink = await bot.generateInvite('ADMINISTRATOR');
-  console.log('Invite GME with Minimal permissions: ' + minLink);
-  console.log('Invite with Full Admin: ' + maxLink);*/
+  //let inviteLink = await bot.generateInvite(201714752);
+  //console.log('Invite to server: ' + inviteLink);
+});
+
+/***************************************************
+ ******************* WOOF Ticker *******************
+ ***************************************************/
+const woof = new Discord.Client();
+
+woof.on('ready', async function () {
+  console.log(`Logged in as ${woof.user.tag}`);
+
+  woof.user.setActivity('$WOOF - Petco Health and Wellness', {
+    type: 'WATCHING',
+  });
+  updateWoof();
+
+  //let inviteLink = await bot.generateInvite(201714752);
+  //console.log('Invite to server: ' + inviteLink);
 });
 
 /***************************************************
  ****************  Nickname Updates  ***************
  ***************************************************/
 //GME
-getPrice('GME', async function (price) {
-  (await gme.guilds.fetch('602939070502666250')).me.setNickname(`$` + price);
-  console.log(price);
-});
+async function updateGME() {
+  getPrice('GME', async function (price) {
+    (await gme.guilds.fetch('602939070502666250')).me.setNickname(`$` + price);
+  });
+}
+
+//Woof
+async function updateWoof() {
+  getPrice('WOOF', async function (price) {
+    (await woof.guilds.fetch('602939070502666250')).me.setNickname(`$` + price);
+  });
+}
 
 /***************************************************
  *******************  Bot Logins  ******************
@@ -129,22 +132,20 @@ getPrice('GME', async function (price) {
 // Main Bot
 bot.login(process.env.BOT_TOKEN);
 
-//GME Ticket
+//GME Ticker
 gme.login(process.env.GME_TOKEN);
+
+//WOOF Ticker
+woof.login(process.env.WOOF_TOKEN);
 
 /***************************************************
  *******************  Functions  *******************
  ***************************************************/
 
 function getPrice(symbol, callback) {
-  finnhubClient.quote(symbol, (error, data, response) => {
-    console.log(data.c);
+  yahoo.price(symbol, function (err, data) {
+    price = (Math.round(data * 1000) / 1000).toFixed(2);
+    console.log(symbol + ' price updated to $' + price);
+    return callback(price);
   });
-
-  // finalPrice = (Math.round(price * 1000) / 1000).toFixed(2);
-  // return callback(finalPrice);
-}
-
-function updateNicknames(tickers) {
-  tickers.forEach((symbol) => {});
 }
