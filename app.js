@@ -8,6 +8,11 @@ const fs = require('fs');
 const _ = require('lodash');
 const yahoo = require('yahoo-financial-data');
 
+// Server Arrays
+let botServers = [];
+let gmeServers = [];
+let woofServers = [];
+
 /***********************************************************
  *********************  Main Bot Setup  ********************
  ***********************************************************/
@@ -27,6 +32,10 @@ bot.on('ready', async function () {
   console.log(`Logged in as ${bot.user.tag}`);
 
   bot.user.setActivity('all the stonks', { type: 'WATCHING' });
+
+  bot.guilds.cache.forEach((server) => {
+    botServers.push(server.id);
+  });
 
   //let inviteLink = await bot.generateInvite(201714752);
   //console.log('Invite to server: ' + inviteLink);
@@ -84,6 +93,10 @@ const gme = new Discord.Client();
 gme.on('ready', async function () {
   console.log(`Logged in as ${gme.user.tag}`);
 
+  gme.guilds.cache.forEach((server) => {
+    gmeServers.push(server.id);
+  });
+
   gme.user.setActivity('$GME - GameStop', { type: 'WATCHING' });
   updateGME();
 
@@ -98,6 +111,10 @@ const woof = new Discord.Client();
 
 woof.on('ready', async function () {
   console.log(`Logged in as ${woof.user.tag}`);
+
+  woof.guilds.cache.forEach((server) => {
+    woofServers.push(server.id);
+  });
 
   woof.user.setActivity('$WOOF - Petco Health and Wellness', {
     type: 'WATCHING',
@@ -114,14 +131,18 @@ woof.on('ready', async function () {
 //GME
 async function updateGME() {
   getPrice('GME', async function (price) {
-    (await gme.guilds.fetch('602939070502666250')).me.setNickname(`$` + price);
+    gmeServers.forEach(async function (server) {
+      (await gme.guilds.fetch(server)).me.setNickname(`$` + price);
+    });
   });
 }
 
 //Woof
 async function updateWoof() {
   getPrice('WOOF', async function (price) {
-    (await woof.guilds.fetch('602939070502666250')).me.setNickname(`$` + price);
+    woofServers.forEach(async function (server) {
+      (await woof.guilds.fetch(server)).me.setNickname(`$` + price);
+    });
   });
 }
 
