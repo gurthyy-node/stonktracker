@@ -42,8 +42,8 @@ bot.on('ready', async function () {
     botServers.push(server.id);
   });
 
-  //let inviteLink = await bot.generateInvite(201714752);
-  //console.log('Invite to server: ' + inviteLink);
+  let inviteLink = await bot.generateInvite(201714752);
+  console.log('Invite to server: ' + inviteLink);
 });
 
 /*********************************************************
@@ -105,8 +105,8 @@ gme.on('ready', async function () {
   gme.user.setActivity('$GME - GameStop', { type: 'WATCHING' });
   updateGME();
 
-  //let inviteLink = await bot.generateInvite(201714752);
-  //console.log('Invite to server: ' + inviteLink);
+  //let inviteLink = await gme.generateInvite(201714752);
+  //console.log('Invite gme to server: ' + inviteLink);
 });
 
 /***************************************************
@@ -126,8 +126,8 @@ woof.on('ready', async function () {
   });
   updateWoof();
 
-  //let inviteLink = await bot.generateInvite(201714752);
-  //console.log('Invite to server: ' + inviteLink);
+  //let inviteLink = await woof.generateInvite(201714752);
+  //console.log('Invite woof to server: ' + inviteLink);
 });
 
 /***************************************************
@@ -137,7 +137,7 @@ woof.on('ready', async function () {
 async function updateGME() {
   getPrice('GME', async function (price) {
     gmeServers.forEach(async function (server) {
-      (await gme.guilds.fetch(server)).me.setNickname(`$` + price);
+      (await gme.guilds.fetch(server)).me.setNickname(`1) $` + price);
     });
   });
 }
@@ -146,7 +146,7 @@ async function updateGME() {
 async function updateWoof() {
   getPrice('WOOF', async function (price) {
     woofServers.forEach(async function (server) {
-      (await woof.guilds.fetch(server)).me.setNickname(`$` + price);
+      (await woof.guilds.fetch(server)).me.setNickname(`2) $` + price);
     });
   });
 }
@@ -159,10 +159,10 @@ async function updateWoof() {
 bot.login(process.env.BOT_TOKEN);
 
 //GME Ticker
-gme.login(process.env.GME_TOKEN);
+//gme.login(process.env.GME_TOKEN);
 
 //WOOF Ticker
-woof.login(process.env.WOOF_TOKEN);
+//woof.login(process.env.WOOF_TOKEN);
 
 /***************************************************
  *******************  Functions  *******************
@@ -171,7 +171,7 @@ woof.login(process.env.WOOF_TOKEN);
 function getPrice(symbol, callback) {
   yahoo.price(symbol, function (err, data) {
     price = (Math.round(data * 1000) / 1000).toFixed(2);
-    //of mainconsole.log(symbol + ' price updated to $' + price);
+    //console.log(symbol + ' price updated to $' + price);
     return callback(price);
   });
 }
