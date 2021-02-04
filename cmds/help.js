@@ -7,7 +7,7 @@ module.exports = {
   description: 'List all currently available commands.',
   aliases: ['h', 'commands'],
   displayInHelp: true,
-  execute(message, args) {
+  async execute(message, args) {
     const { cmds } = message.client;
 
     let embed = new Discord.MessageEmbed();

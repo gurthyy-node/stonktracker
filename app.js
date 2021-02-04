@@ -42,8 +42,8 @@ bot.on('ready', async function () {
     botServers.push(server.id);
   });
 
-  let inviteLink = await bot.generateInvite(201714752);
-  console.log('Invite to server: ' + inviteLink);
+  //let inviteLink = await bot.generateInvite(201714752);
+  //console.log('Invite to server: ' + inviteLink);
 });
 
 /*********************************************************
@@ -53,6 +53,8 @@ bot.on('ready', async function () {
 bot.on('message', async (message) => {
   if (message.author.bot) return;
   if (message.channel.type === 'dm') return;
+  if (message.content === '.') return;
+  let sender = message.author;
 
   const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
@@ -61,24 +63,12 @@ bot.on('message', async (message) => {
     bot.cmds.get(commandName) ||
     bot.cmds.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
-  if (!command) {
-    return message.reply(
-      `This command doesn't exist. Use **${process.env.PREFIX}help** to see all commands.`,
-    );
-  }
-
-  if (
-    command.adminOnly &&
-    !message.member.roles.cache.has(process.env.ADMIN_ROLE)
-  ) {
-    return message.reply('You do not have access to this command. Sorry!');
-  }
-
   if (command.args && !args.length) {
     return message.channel.send(
       `You forgot to enter something. Use **${process.env.PREFIX}help** to see usage details.`,
     );
   }
+  console.log(message.channel);
 
   try {
     command.execute(message, args, bot);
@@ -88,68 +78,26 @@ bot.on('message', async (message) => {
       'There was an issue running this command. Please try again later.',
     );
   }
+
+  /**************** Reputation System *****************/
+
+  var userData = JSON.parse(fs.readFileSync('Storage/userData.json', utf8));
+
+  if (!userData[sender.id])
+    userData[sender.id] = {
+      messagesSent: 0,
+    };
+
+  userData[sender.id].messagesSent++;
+
+  fs.writeFile('Storage/userData.json', JSON.stringify(userData), (err) => {
+    if (err) console.error(err);
+  });
 });
 
 /***************************************************
- ******************* GME Ticker ********************
+ ******* Global Reaction Handler (Best Of) *********
  ***************************************************/
-const gme = new Discord.Client();
-
-gme.on('ready', async function () {
-  console.log(`Logged in as ${gme.user.tag}`);
-
-  gme.guilds.cache.forEach((server) => {
-    gmeServers.push(server.id);
-  });
-
-  gme.user.setActivity('$GME - GameStop', { type: 'WATCHING' });
-  updateGME();
-
-  //let inviteLink = await gme.generateInvite(201714752);
-  //console.log('Invite gme to server: ' + inviteLink);
-});
-
-/***************************************************
- ******************* WOOF Ticker *******************
- ***************************************************/
-const woof = new Discord.Client();
-
-woof.on('ready', async function () {
-  console.log(`Logged in as ${woof.user.tag}`);
-
-  woof.guilds.cache.forEach((server) => {
-    woofServers.push(server.id);
-  });
-
-  woof.user.setActivity('$WOOF - Petco Health and Wellness', {
-    type: 'WATCHING',
-  });
-  updateWoof();
-
-  //let inviteLink = await woof.generateInvite(201714752);
-  //console.log('Invite woof to server: ' + inviteLink);
-});
-
-/***************************************************
- ****************  Nickname Updates  ***************
- ***************************************************/
-//GME
-async function updateGME() {
-  getPrice('GME', async function (price) {
-    gmeServers.forEach(async function (server) {
-      (await gme.guilds.fetch(server)).me.setNickname(`1) $` + price);
-    });
-  });
-}
-
-//Woof
-async function updateWoof() {
-  getPrice('WOOF', async function (price) {
-    woofServers.forEach(async function (server) {
-      (await woof.guilds.fetch(server)).me.setNickname(`2) $` + price);
-    });
-  });
-}
 
 /***************************************************
  *******************  Bot Logins  ******************
@@ -157,12 +105,6 @@ async function updateWoof() {
 
 // Main Bot
 bot.login(process.env.BOT_TOKEN);
-
-//GME Ticker
-//gme.login(process.env.GME_TOKEN);
-
-//WOOF Ticker
-//woof.login(process.env.WOOF_TOKEN);
 
 /***************************************************
  *******************  Functions  *******************
@@ -174,9 +116,4 @@ function getPrice(symbol, callback) {
     //console.log(symbol + ' price updated to $' + price);
     return callback(price);
   });
-}
-
-function autoUpdate() {
-  updateGME();
-  updateWoof();
 }
