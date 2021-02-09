@@ -56,6 +56,7 @@ bot.on('message', async (message) => {
   if (message.content === '.') return;
   let sender = message.author;
 
+  //Handle the message
   const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
   if (!message.content.startsWith(prefix)) return;
@@ -78,21 +79,6 @@ bot.on('message', async (message) => {
       'There was an issue running this command. Please try again later.',
     );
   }
-
-  /**************** Reputation System *****************/
-
-  var userData = JSON.parse(fs.readFileSync('Storage/userData.json', utf8));
-
-  if (!userData[sender.id])
-    userData[sender.id] = {
-      messagesSent: 0,
-    };
-
-  userData[sender.id].messagesSent++;
-
-  fs.writeFile('Storage/userData.json', JSON.stringify(userData), (err) => {
-    if (err) console.error(err);
-  });
 });
 
 /***************************************************
@@ -117,3 +103,7 @@ function getPrice(symbol, callback) {
     return callback(price);
   });
 }
+
+/***************************************************
+ ************* ETF Functions and Stuff *************
+ ***************************************************/
